@@ -1,9 +1,7 @@
 import Logo from "../../assets/logo-pic.jpeg";
-
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-
 import { FaHandSparkles } from "react-icons/fa";
 import { AiOutlineSearch } from "react-icons/ai";
 import { BsBasket3 } from "react-icons/bs";
@@ -12,18 +10,22 @@ import { HiBars3 } from "react-icons/hi2";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { FaBars } from "react-icons/fa6";
 import { MdKeyboardArrowUp } from "react-icons/md";
-
 import SideNav from "../sideBar/SideNav";
 import NavLinks from "../NavLinks";
 import Categories from "./categories";
 import { calculateTotals } from "../../slice/cart";
+import { UserAuth } from "../Auth/authentication";
 
 export default function BottomNav() {
+  let { session, signOutUser } = UserAuth();
+  const handelLogOut = () => {
+    signOutUser();
+    navigate("/signIn");
+  };
   const { data } = useSelector((state) => state.DataSlice);
   const { cartItems, totalAmount } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
 
   const [Fixed, setFixed] = useState(false);
   const [openNav, setOpenNav] = useState(false);
@@ -32,20 +34,20 @@ export default function BottomNav() {
   const [searchedData, setSearchedData] = useState([]);
 
   let handelCategoriesMenu = useCallback(() => {
-    setOpenCategories(prev => !prev);
-  },[])
+    setOpenCategories((prev) => !prev);
+  }, []);
 
   let handelCloseNav = useCallback(() => {
     setOpenNav(false);
-  },[])
+  }, []);
 
-  let handelOpenNav = useCallback(()=> {
+  let handelOpenNav = useCallback(() => {
     setOpenNav(true);
-  },[])
+  }, []);
 
-  let handelChange = useCallback((e) =>{
-      setQuery(e.target.value);
-  },[])
+  let handelChange = useCallback((e) => {
+    setQuery(e.target.value);
+  }, []);
 
   useEffect(() => {
     dispatch(calculateTotals());
@@ -135,7 +137,14 @@ export default function BottomNav() {
             </div>
           </div>
         </div>
-
+        {session && (
+          <h2 className="text-center font-semibold text-[20px]">
+            Welcome{" "}
+            <span className="text-primary">
+              {session.user.user_metadata.userName}
+            </span>
+          </h2>
+        )}
         <div className="middle-box h-[60px]">
           <div className="container mx-auto h-full flex items-center justify-between">
             <NavLink to="/" className="w-[130px] overflow-hidden">
@@ -183,15 +192,25 @@ export default function BottomNav() {
             </div>
 
             <div className="user-box flex items-center gap-4">
-              {/* ===========signIn======== */}
-              <div className="log-In-Out">
-                <NavLink
-                  to="signUp"
-                  className="In w-[42px] h-[42px] border-[1px] border-solid border-borderColor rounded-full flex justify-center items-center cursor-pointer"
-                >
-                  <BiUser className="text-xl text-mainColor" />
-                </NavLink>
-              </div>
+              {session ? (
+                <div className="log-In-Out">
+                  <button
+                    className="text-white bg-red-600 hover:bg-red-700 rounded-md px-4 py-2 cursor-pointer"
+                    onClick={handelLogOut}
+                  >
+                    LogOut
+                  </button>
+                </div>
+              ) : (
+                <div className="log-In-Out">
+                  <NavLink
+                    to="signUp"
+                    className="In w-[42px] h-[42px] border-[1px] border-solid border-borderColor rounded-full flex justify-center items-center cursor-pointer"
+                  >
+                    <BiUser className="text-xl text-mainColor" />
+                  </NavLink>
+                </div>
+              )}
 
               {/* ==========products total Price======== */}
               <div className="totalPrice">
@@ -248,6 +267,14 @@ export default function BottomNav() {
           Fixed ? "fixed top-0 right-0 left-0 w-full" : "relative"
         }`}
       >
+        {session && (
+          <h2 className="text-center font-semibold text-[20px]">
+            Welcome{" "}
+            <span className="text-primary">
+              {session.user.user_metadata.userName}
+            </span>
+          </h2>
+        )}
         <div className="container mx-auto flex justify-between items-center">
           <button
             className="menu-btn cursor-pointer border-[1px] border-solid border-borderColor rounded-[5px] text-lightGray p-2"
@@ -263,11 +290,25 @@ export default function BottomNav() {
           </div>
 
           <div className="user-box flex items-center gap-4">
-            <div className="log-In-Out">
-              <div className="In w-[42px] h-[42px] border-[1px] border-solid border-borderColor rounded-full flex justify-center items-center cursor-pointer">
-                <BiUser className="text-xl text-mainColor" />
+            {session ? (
+              <div className="log-In-Out">
+                <button
+                  className="text-white bg-red-600 hover:bg-red-700 rounded-md px-4 py-2 cursor-pointer"
+                  onClick={handelLogOut}
+                >
+                  LogOut
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className="log-In-Out">
+                <NavLink
+                  to="signUp"
+                  className="In w-[42px] h-[42px] border-[1px] border-solid border-borderColor rounded-full flex justify-center items-center cursor-pointer"
+                >
+                  <BiUser className="text-xl text-mainColor" />
+                </NavLink>
+              </div>
+            )}
 
             <Link
               to="/cart"
